@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes, FC, useRef } from 'react';
+import React, { ButtonHTMLAttributes, FC, useRef, useState } from 'react';
 import { BehaviorSubject } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
 import { delay, switchMap, tap } from 'rxjs/operators';
@@ -19,6 +19,7 @@ const CommandButton: FC<CommandButtonProps & ButtonHTMLAttributes<HTMLButtonElem
 };
 
 function App() {
+  const [loading, setLoading] = useState(false);
   const twoDisabledState = useRef(new BehaviorSubject(false));
 
   const fromFetchUsers = useRef(
@@ -31,12 +32,12 @@ function App() {
 
   const commandOne = useCustomCommand(
     fromFetchUsers.current
-      .pipe(tap(data => console.log('1', data)))
+      .pipe(tap(data => console.log('1', data, loading)))
   );
 
   const commandTwo = useCustomCommand(
     fromFetchUsers.current
-      .pipe(tap(data => console.log('2', data))),
+      .pipe(tap(data => console.log('2', data, loading))),
     twoDisabledState.current.asObservable()
   );
 
@@ -53,6 +54,9 @@ function App() {
       <CommandButton command={ commandTwo }>Button 2</CommandButton>
       <br/><br/>
       <button onClick={ toggle }>Toggle button 2 state</button>
+      <br/><br/>
+      <button onClick={ () => setLoading(p => !p) }>Toggle Loading</button>
+      <p>Loading value is: {String(loading)}</p>
     </div>
   );
 }
